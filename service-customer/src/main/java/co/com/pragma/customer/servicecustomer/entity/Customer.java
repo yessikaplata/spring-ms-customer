@@ -16,6 +16,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +33,7 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
 	private Long id;
 
 	@NotNull (message = "Identification Type must not be null.")
