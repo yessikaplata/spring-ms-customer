@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import co.com.pragma.customer.servicecustomer.error.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
-import co.com.pragma.customer.servicecustomer.error.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import lombok.RequiredArgsConstructor;
 

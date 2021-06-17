@@ -17,7 +17,7 @@ import javax.validation.Valid;
 
 import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
-import co.com.pragma.customer.servicecustomer.error.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
 import co.com.pragma.customer.servicecustomer.service.CustomerServiceInterface;
 
 @RestController

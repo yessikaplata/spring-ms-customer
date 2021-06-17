@@ -1,4 +1,4 @@
-package co.com.pragma.customer.servicecustomer.error;
+package co.com.pragma.customer.servicecustomer.exception;
 
 import org.springframework.http.HttpStatus;
 
