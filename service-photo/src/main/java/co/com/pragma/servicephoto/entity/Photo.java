@@ -27,6 +27,8 @@ public class Photo {
 
 	private Date createAt;
 
+	private Date updateAt;
+
 	private long size;
 
 	private String contenttype;

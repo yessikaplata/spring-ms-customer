@@ -38,7 +38,7 @@ public class CustomerController {
 		} else {
 			customers = service.listAllCustomers();
 		}
-		if (customers == null || customers.size() == 0) {
+		if (customers == null || customers.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
 		return ResponseEntity.ok(customers);

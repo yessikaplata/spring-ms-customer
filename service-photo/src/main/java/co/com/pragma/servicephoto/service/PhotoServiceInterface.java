@@ -14,4 +14,8 @@ public interface PhotoServiceInterface {
 	public Photo createPhoto(MultipartFile file) throws IOException ;
 	
 	public Photo getPhoto(String id);
+	
+	public Photo updatePhoto(String id, MultipartFile file) throws IOException ;
+	
+	public Photo deletePhoto(String id);
 }
