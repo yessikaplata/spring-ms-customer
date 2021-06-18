@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,12 +27,19 @@ public class PhotoServiceImpl implements PhotoServiceInterface {
 	@Override
 	public Photo createPhoto(MultipartFile file) throws IOException {
 		Photo photo = new Photo();
-		photo.setContent(new Binary(file.getBytes()));
-		photo.setContenttype(file.getContentType());
+		photo.setContent(file.getBytes());
+		photo.setContentType(file.getContentType());
 		photo.setCreateAt(new Date());
 		photo.setUpdateAt(photo.getCreateAt());
 		photo.setName(file.getOriginalFilename());
 		photo.setSize(file.getSize());
+		return photoRepository.save(photo);
+	}
+	
+	@Override
+	public Photo createPhoto(Photo photo) {
+		photo.setCreateAt(new Date());
+		photo.setUpdateAt(photo.getCreateAt());
 		return photoRepository.save(photo);
 	}
 
@@ -48,12 +54,26 @@ public class PhotoServiceImpl implements PhotoServiceInterface {
 		if(photo==null) {
 			return null;
 		}
-		photo.setContent(new Binary(file.getBytes()));
-		photo.setContenttype(file.getContentType());
+		photo.setContent(file.getBytes());
+		photo.setContentType(file.getContentType());
 		photo.setUpdateAt(new Date());
 		photo.setName(file.getOriginalFilename());
 		photo.setSize(file.getSize());
 		return photoRepository.save(photo);
+	}
+
+	@Override
+	public Photo updatePhoto(String id, Photo photo) {
+		Photo photoDB = photoRepository.findById(id).orElse(null);
+		if(photoDB==null) {
+			return null;
+		}
+		photoDB.setContent(photo.getContent());
+		photoDB.setContentType(photo.getContentType());
+		photoDB.setUpdateAt(new Date());
+		photoDB.setName(photo.getName());
+		photoDB.setSize(photo.getSize());
+		return photoRepository.save(photoDB);
 	}
 
 	@Override

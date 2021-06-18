@@ -10,12 +10,16 @@ import co.com.pragma.servicephoto.entity.Photo;
 public interface PhotoServiceInterface {
 
 	public List<Photo> listAllPhotos();
-	
-	public Photo createPhoto(MultipartFile file) throws IOException ;
-	
+
+	public Photo createPhoto(MultipartFile file) throws IOException;
+
+	public Photo createPhoto(Photo photo);
+
 	public Photo getPhoto(String id);
-	
-	public Photo updatePhoto(String id, MultipartFile file) throws IOException ;
-	
+
+	public Photo updatePhoto(String id, Photo photo);
+
+	public Photo updatePhoto(String id, MultipartFile file) throws IOException;
+
 	public Photo deletePhoto(String id);
 }

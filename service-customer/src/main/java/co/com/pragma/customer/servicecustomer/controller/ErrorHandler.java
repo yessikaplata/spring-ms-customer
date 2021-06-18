@@ -28,7 +28,6 @@ public class ErrorHandler {
 	private static final ConcurrentHashMap<String, Integer> STATUS_CODES = new ConcurrentHashMap<>();
 
 	public ErrorHandler() {
-		STATUS_CODES.put(ServiceCustomerException.class.getSimpleName(), HttpStatus.INTERNAL_SERVER_ERROR.value());
 		STATUS_CODES.put(MethodArgumentNotValidException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
 	}
 
@@ -47,6 +46,7 @@ public class ErrorHandler {
 		ErrorMessage error = ErrorMessage.builder().message(mensaje).nameException(excepcionNombre)
 				.uriRequest(request.getRequestURI()).statusCode(codigo).build();
 		resultado = new ResponseEntity<>(error, HttpStatus.valueOf(codigo));
+		log.error(exception.getMessage());
 		return resultado;
 	}
 

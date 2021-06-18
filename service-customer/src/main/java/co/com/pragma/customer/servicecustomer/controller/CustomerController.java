@@ -76,7 +76,7 @@ public class CustomerController {
 		if (customerDeleted == null) {
 			return ResponseEntity.notFound().build();
 		}
-		return ResponseEntity.ok(customerDeleted);
+		return ResponseEntity.ok().build();
 	}
 
 }

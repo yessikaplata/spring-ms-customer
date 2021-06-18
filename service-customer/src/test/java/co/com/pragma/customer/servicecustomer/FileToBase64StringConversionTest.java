@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FileToBase64StringConversionTest {
-	private String inputFilePath = "D:/imgs/test_image.jpg";
-	private String outputFilePath = "D:/imgs/test_image_copy.jpg";
+	private String inputFilePath = "D:/imgs/test_image1.png";
+	private String outputFilePath = "D:/imgs/test_image_copy1.png";
 	
 	
 	@Test

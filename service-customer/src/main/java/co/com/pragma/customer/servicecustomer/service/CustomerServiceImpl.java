@@ -3,13 +3,18 @@ package co.com.pragma.customer.servicecustomer.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import co.com.pragma.customer.servicecustomer.client.PhotoClientInterface;
 import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.model.Photo;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import lombok.RequiredArgsConstructor;
 
@@ -19,49 +24,99 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 	private final CustomerRepositoryInterface customerRepository;
 
+	@Autowired
+	private PhotoClientInterface photoClient;
+
 	@Override
 	public List<Customer> listAllCustomers() {
-		return customerRepository.findAll();
+		List<Customer> customers = customerRepository.findAll();
+		return findPhotoCustomers(customers);
 	}
 
 	@Override
 	public Customer getCustomer(int identificationType, String identification) {
-		return customerRepository.findByIdentificationAndIdentificationType(identification,
+		Customer customer = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
+		if (customer != null && customer.getPhotoId() != null) {
+			Photo photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
+			customer.setPhoto(photo);
+		}
+		return customer;
 	}
 
+	@Transactional
 	@Override
 	public Customer createCustomer(Customer customer) throws ServiceCustomerException {
-		Customer customerDB = getCustomer(customer.getIdentificationType().getId(), customer.getIdentification());
+		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
+				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		if (customerDB != null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer exists in database");
 		}
+
+		// save customer
 		customer.setCreateAt(new Date());
 		customer.setUpdateAt(customer.getCreateAt());
-		return customerRepository.save(customer);
+
+		// save photo and update customer
+		if (customer.getPhoto() != null) {
+			Photo photo = photoClient.createPhoto(customer.getPhoto()).getBody();
+			if (photo != null) {
+				customer.setPhotoId(photo.getId());
+			}
+		}
+		customerDB = customerRepository.save(customer);
+		return customerDB;
 	}
 
+	@Transactional
 	@Override
 	public Customer updateCustomer(Customer customer) {
-		Customer customerDB = getCustomer(customer.getIdentificationType().getId(), customer.getIdentification());
+		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
+				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		if (customerDB == null) {
 			return null;
 		}
+
+		// update customer
 		customerDB.setAge(customer.getAge());
 		customerDB.setCityOfBirth(customer.getCityOfBirth());
 		customerDB.setLastName(customer.getLastName());
 		customerDB.setName(customer.getName());
 		customerDB.setUpdateAt(new Date());
-		return customerRepository.save(customerDB);
+
+		// update or save photo
+		if (customer.getPhoto() != null) {
+			Photo photo = photoClient.getPhoto(customerDB.getPhotoId()).getBody();
+			if (photo == null) {
+				photo = photoClient.createPhoto(customer.getPhoto()).getBody();
+			} else {
+				photo.setContent(customer.getPhoto().getContent());
+				photo.setContentType(customer.getPhoto().getContentType());
+				photo.setUpdateAt(new Date());
+				photo.setName(customer.getPhoto().getName());
+				photo.setSize(customer.getPhoto().getSize());
+				photoClient.updatePhoto(photo.getId(), photo);
+			}
+			customerDB.setPhotoId(photo.getId());
+			customerDB.setPhoto(photo);
+		}
+		customerRepository.save(customerDB);
+		return customerDB;
 	}
 
+	@Transactional
 	@Override
 	public Customer deleteCustomer(int identificationType, String identification) {
-		Customer customerDB = getCustomer(identificationType, identification);
+		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(identification,
+				IdentificationType.builder().id(identificationType).build());
 		if (customerDB == null) {
 			return null;
 		}
 		customerRepository.delete(customerDB);
+
+		if (customerDB.getPhotoId() != null) {
+			photoClient.deletePhoto(customerDB.getPhotoId());
+		}
 		return customerDB;
 	}
 
@@ -84,6 +139,17 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 		default:
 			customers = customerRepository.findByAge(age);
 			break;
+		}
+		return findPhotoCustomers(customers);
+	}
+
+	private List<Customer> findPhotoCustomers(List<Customer> customers) {
+		if (customers != null) {
+			Photo photo = null;
+			for (Customer customer : customers) {
+				photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
+				customer.setPhoto(photo);
+			}
 		}
 		return customers;
 	}

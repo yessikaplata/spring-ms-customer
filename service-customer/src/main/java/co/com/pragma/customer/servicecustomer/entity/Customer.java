@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.com.pragma.customer.servicecustomer.model.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,26 +37,25 @@ public class Customer {
 	@JsonIgnore
 	private Long id;
 
-	@NotNull (message = "Identification Type must not be null.")
+	@NotNull(message = "Identification Type must not be null.")
 	@ManyToOne
 	@JoinColumn(name = "identification_type_id")
 	private IdentificationType identificationType;
 
-	@NotEmpty (message = "Identification must not be empty.")
+	@NotEmpty(message = "Identification must not be empty.")
 	private String identification;
 
-
-	@NotEmpty (message = "Name must not be empty.")
+	@NotEmpty(message = "Name must not be empty.")
 	private String name;
 
-	@NotEmpty (message = "Lastname must not be empty.")
+	@NotEmpty(message = "Lastname must not be empty.")
 	@Column(name = "last_name")
 	private String lastName;
 
-	@NotNull (message = "Age must not be null.")
+	@NotNull(message = "Age must not be null.")
 	private Integer age;
 
-	@NotNull (message = "City of birth must not be null.")
+	@NotNull(message = "City of birth must not be null.")
 	@ManyToOne
 	@JoinColumn(name = "city_of_birth_id")
 	private City cityOfBirth;
@@ -67,8 +67,11 @@ public class Customer {
 	@Column(name = "update_at")
 	@Temporal(TemporalType.DATE)
 	private Date updateAt;
-	
+
+	@Column(name = "photo_id")
+	private String photoId;
+
 	@Transient
-	private String photoBase64;
+	private Photo photo;
 
 }

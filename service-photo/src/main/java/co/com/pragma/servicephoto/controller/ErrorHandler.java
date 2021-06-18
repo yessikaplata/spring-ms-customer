@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import co.com.pragma.servicephoto.exception.ServicePhotoException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,7 +37,7 @@ public class ErrorHandler {
 
 		String excepcionNombre = exception.getClass().getSimpleName();
 		String mensaje = formatMessage(exception);
-		Integer codigo = STATUS_CODES.get(exception.getClass().getSimpleName());
+		Integer codigo = getStatusCode(exception);
 
 		if (codigo == null) {
 			codigo = HttpStatus.INTERNAL_SERVER_ERROR.value();
@@ -45,7 +46,18 @@ public class ErrorHandler {
 		ErrorMessage error = ErrorMessage.builder().message(mensaje).nameException(excepcionNombre)
 				.uriRequest(request.getRequestURI()).statusCode(codigo).build();
 		resultado = new ResponseEntity<>(error, HttpStatus.valueOf(codigo));
+		log.error(exception.getMessage());
 		return resultado;
+	}
+	
+	private Integer getStatusCode(Exception e) {
+		if (e instanceof ServicePhotoException) {
+			ServicePhotoException ex = (ServicePhotoException) e;
+			if (ex.getHttpStatus() != null) {
+				return ex.getHttpStatus().value();
+			}
+		}
+		return STATUS_CODES.get(e.getClass().getSimpleName());
 	}
 
 	private String formatMessage(Exception e) {

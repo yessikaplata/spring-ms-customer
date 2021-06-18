@@ -1,9 +1,6 @@
-package co.com.pragma.servicephoto.entity;
+package co.com.pragma.customer.servicecustomer.model;
 
 import java.util.Date;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,13 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@Document(collection = "photos")
 public class Photo {
 
-	@Id
 	private String id;
 
 	private String name;
