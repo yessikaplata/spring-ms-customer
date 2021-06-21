@@ -1,5 +1,7 @@
 package co.com.pragma.customer.servicecustomer.controller;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,13 +14,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorMessage {
-
+	
+	private Date created;
+	
+	private int status;
+	
+	private String error;
+	
 	private String message;
 
-	private String nameException;
+	private String exception;
 	
-	private String uriRequest;
+	private String path;
 	
-	private int statusCode;
 
 }

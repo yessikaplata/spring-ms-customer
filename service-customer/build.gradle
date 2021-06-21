@@ -34,8 +34,10 @@ dependencies {
 	implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '3.0.4'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'		
-	//implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	//implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: '2.2.8.RELEASE'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.5.1'
 	//implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 	//implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }

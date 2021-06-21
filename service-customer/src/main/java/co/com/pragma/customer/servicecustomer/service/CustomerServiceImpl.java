@@ -47,8 +47,10 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public Customer createCustomer(Customer customer) throws ServiceCustomerException {
+		Photo photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
+		
 		if (customerDB != null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer exists in database");
 		}
@@ -59,18 +61,21 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 		// save photo and update customer
 		if (customer.getPhoto() != null) {
-			Photo photo = photoClient.createPhoto(customer.getPhoto()).getBody();
+			photo = photoClient.createPhoto(customer.getPhoto()).getBody();
 			if (photo != null) {
 				customer.setPhotoId(photo.getId());
+				customer.setPhoto(photo);
 			}
 		}
 		customerDB = customerRepository.save(customer);
+		customerDB.setPhoto(photo);
 		return customerDB;
 	}
 
 	@Transactional
 	@Override
 	public Customer updateCustomer(Customer customer) {
+		Photo photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		if (customerDB == null) {
@@ -86,7 +91,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 		// update or save photo
 		if (customer.getPhoto() != null) {
-			Photo photo = photoClient.getPhoto(customerDB.getPhotoId()).getBody();
+			photo = photoClient.getPhoto(customerDB.getPhotoId()).getBody();
 			if (photo == null) {
 				photo = photoClient.createPhoto(customer.getPhoto()).getBody();
 			} else {
@@ -101,6 +106,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 			customerDB.setPhoto(photo);
 		}
 		customerRepository.save(customerDB);
+		customerDB.setPhoto(photo);
 		return customerDB;
 	}
 

@@ -26,6 +26,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '3.0.4'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '2.5.1'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '3.0.3'
 }
 
 test {

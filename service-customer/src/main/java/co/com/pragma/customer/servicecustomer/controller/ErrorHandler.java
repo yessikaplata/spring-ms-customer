@@ -1,5 +1,6 @@
 package co.com.pragma.customer.servicecustomer.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,8 @@ public class ErrorHandler {
 			codigo = HttpStatus.INTERNAL_SERVER_ERROR.value();
 		}
 
-		ErrorMessage error = ErrorMessage.builder().message(mensaje).nameException(excepcionNombre)
-				.uriRequest(request.getRequestURI()).statusCode(codigo).build();
+		ErrorMessage error = ErrorMessage.builder().message(mensaje).exception(excepcionNombre).created(new Date())
+				.path(request.getRequestURI()).status(codigo).error(HttpStatus.valueOf(codigo).name()).build();
 		resultado = new ResponseEntity<>(error, HttpStatus.valueOf(codigo));
 		log.error(exception.getMessage());
 		return resultado;
