@@ -14,7 +14,7 @@ import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
-import co.com.pragma.customer.servicecustomer.model.Photo;
+import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +38,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 		Customer customer = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
 		if (customer != null && customer.getPhotoId() != null) {
-			Photo photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
+			PhotoDTO photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
 			customer.setPhoto(photo);
 		}
 		return customer;
@@ -47,7 +47,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public Customer createCustomer(Customer customer) throws ServiceCustomerException {
-		Photo photo = null;
+		PhotoDTO photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		
@@ -75,7 +75,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public Customer updateCustomer(Customer customer) {
-		Photo photo = null;
+		PhotoDTO photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		if (customerDB == null) {
@@ -151,7 +151,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 	private List<Customer> findPhotoCustomers(List<Customer> customers) {
 		if (customers != null) {
-			Photo photo = null;
+			PhotoDTO photo = null;
 			for (Customer customer : customers) {
 				photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
 				customer.setPhoto(photo);

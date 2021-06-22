@@ -9,21 +9,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import co.com.pragma.customer.servicecustomer.model.Photo;
+import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 
 @FeignClient(name = "service-photo", path = "/photos", fallback = PhotoHystrixFallBackFactory.class)
 public interface PhotoClientInterface {
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Photo> getPhoto(@PathVariable("id") String id);
+	public ResponseEntity<PhotoDTO> getPhoto(@PathVariable("id") String id);
 
 	@PostMapping
-	public ResponseEntity<Photo> createPhoto(@RequestBody(required = true) Photo photo);
+	public ResponseEntity<PhotoDTO> createPhoto(@RequestBody(required = true) PhotoDTO photo);
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Photo> updatePhoto(@PathVariable("id") String id, @RequestBody(required = true) Photo photo);
+	public ResponseEntity<PhotoDTO> updatePhoto(@PathVariable("id") String id, @RequestBody(required = true) PhotoDTO photo);
 
 
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Photo> deletePhoto(@PathVariable("id") String id);
+	public ResponseEntity<PhotoDTO> deletePhoto(@PathVariable("id") String id);
 }

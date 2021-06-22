@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import co.com.pragma.customer.servicecustomer.model.Photo;
+import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -72,6 +72,6 @@ public class Customer {
 	private String photoId;
 
 	@Transient
-	private Photo photo;
+	private PhotoDTO photo;
 
 }

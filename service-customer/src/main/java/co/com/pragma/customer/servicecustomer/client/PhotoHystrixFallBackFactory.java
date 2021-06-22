@@ -3,28 +3,28 @@ package co.com.pragma.customer.servicecustomer.client;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import co.com.pragma.customer.servicecustomer.model.Photo;
+import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 
 @Component
 public class PhotoHystrixFallBackFactory implements PhotoClientInterface {
 
 	@Override
-	public ResponseEntity<Photo> getPhoto(String id) {
+	public ResponseEntity<PhotoDTO> getPhoto(String id) {
 		return ResponseEntity.notFound().build();
 	}
 
 	@Override
-	public ResponseEntity<Photo> createPhoto(Photo photo) {
+	public ResponseEntity<PhotoDTO> createPhoto(PhotoDTO photo) {
 		return ResponseEntity.notFound().build();
 	}
 
 	@Override
-	public ResponseEntity<Photo> updatePhoto(String id, Photo photo) {
+	public ResponseEntity<PhotoDTO> updatePhoto(String id, PhotoDTO photo) {
 		return ResponseEntity.notFound().build();
 	}
 
 	@Override
-	public ResponseEntity<Photo> deletePhoto(String id) {
+	public ResponseEntity<PhotoDTO> deletePhoto(String id) {
 		return ResponseEntity.notFound().build();
 	}
 
