@@ -5,21 +5,21 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import co.com.pragma.servicephoto.entity.Photo;
+import co.com.pragma.servicephoto.model.PhotoDTO;
 
 public interface PhotoServiceInterface {
 
-	public List<Photo> listAllPhotos();
+	public List<PhotoDTO> listAllPhotos();
 
-	public Photo createPhoto(MultipartFile file) throws IOException;
+	public PhotoDTO createPhoto(MultipartFile file) throws IOException;
 
-	public Photo createPhoto(Photo photo);
+	public PhotoDTO createPhoto(PhotoDTO photo);
 
-	public Photo getPhoto(String id);
+	public PhotoDTO getPhoto(String id);
 
-	public Photo updatePhoto(String id, Photo photo);
+	public PhotoDTO updatePhoto(String id, PhotoDTO photo);
 
-	public Photo updatePhoto(String id, MultipartFile file) throws IOException;
+	public PhotoDTO updatePhoto(String id, MultipartFile file) throws IOException;
 
-	public Photo deletePhoto(String id);
+	public void deletePhoto(String id);
 }

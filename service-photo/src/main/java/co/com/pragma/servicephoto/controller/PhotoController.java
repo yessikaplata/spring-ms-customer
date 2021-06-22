@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import co.com.pragma.servicephoto.entity.Photo;
+import co.com.pragma.servicephoto.model.PhotoDTO;
 import co.com.pragma.servicephoto.service.PhotoServiceInterface;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/photos")
@@ -28,8 +29,9 @@ public class PhotoController {
 	private PhotoServiceInterface photoService;
 
 	@GetMapping
-	public ResponseEntity<List<Photo>> listAllPhotos() {
-		List<Photo> photos = photoService.listAllPhotos();
+	@ApiOperation(value = "Find all photos.", notes = "Find all photos in databases.")
+	public ResponseEntity<List<PhotoDTO>> listAllPhotos() {
+		List<PhotoDTO> photos = photoService.listAllPhotos();
 		if (photos == null || photos.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
@@ -37,8 +39,9 @@ public class PhotoController {
 	}
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Photo> getPhoto(@PathVariable("id") String id) {
-		Photo photo = photoService.getPhoto(id);
+	@ApiOperation(value = "Find photo by id.", notes = "Provide an ID to look up specific photo.")
+	public ResponseEntity<PhotoDTO> getPhoto(@PathVariable("id") String id) {
+		PhotoDTO photo = photoService.getPhoto(id);
 		if (photo == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -46,36 +49,39 @@ public class PhotoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Photo> createPhoto(@RequestBody(required = true) Photo photo) {
-		Photo photoDB = photoService.createPhoto(photo);
+	@ApiOperation(value = "Create photo.", notes = "Provide photo data to create it.")
+	public ResponseEntity<PhotoDTO> createPhoto(@RequestBody(required = true) PhotoDTO photo) {
+		PhotoDTO photoDB = photoService.createPhoto(photo);
 		return ResponseEntity.status(HttpStatus.CREATED).body(photoDB);
 	}
 
 	@PostMapping("/upload")
-	public ResponseEntity<Photo> createPhoto(@RequestParam("photo") MultipartFile photo) throws IOException {
-		Photo photoDB = photoService.createPhoto(photo);
+	@ApiOperation(value = "Create photo.", notes = "Provide file to create it.")
+	public ResponseEntity<PhotoDTO> createPhoto(@RequestParam("photo") MultipartFile photo) throws IOException {
+		PhotoDTO photoDB = photoService.createPhoto(photo);
 		return ResponseEntity.status(HttpStatus.CREATED).body(photoDB);
 	}
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Photo> updatePhoto(@PathVariable("id") String id, @RequestBody(required = true) Photo photo) {
-		Photo photoDB = photoService.updatePhoto(id, photo);
+	@ApiOperation(value = "Update photo.", notes = "Provide an ID and photo data to update it.")
+	public ResponseEntity<PhotoDTO> updatePhoto(@PathVariable("id") String id,
+			@RequestBody(required = true) PhotoDTO photo) {
+		PhotoDTO photoDB = photoService.updatePhoto(id, photo);
 		return ResponseEntity.ok(photoDB);
 	}
 
 	@PutMapping(value = "/upload/{id}")
-	public ResponseEntity<Photo> updatePhoto(@PathVariable("id") String id, @RequestParam("photo") MultipartFile photo)
-			throws IOException {
-		Photo photoDB = photoService.updatePhoto(id, photo);
+	@ApiOperation(value = "Update photo.", notes = "Provide an ID and file to update it.")
+	public ResponseEntity<PhotoDTO> updatePhoto(@PathVariable("id") String id,
+			@RequestParam("photo") MultipartFile photo) throws IOException {
+		PhotoDTO photoDB = photoService.updatePhoto(id, photo);
 		return ResponseEntity.ok(photoDB);
 	}
 
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Photo> deletePhoto(@PathVariable("id") String id) {
-		Photo photo = photoService.deletePhoto(id);
-		if (photo == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(photo);
+	@ApiOperation(value = "Delete photo.", notes = "Provide an ID to delete specific photo.")
+	public ResponseEntity<Void> deletePhoto(@PathVariable("id") String id) {
+		photoService.deletePhoto(id);
+		return ResponseEntity.ok().build();
 	}
 }
