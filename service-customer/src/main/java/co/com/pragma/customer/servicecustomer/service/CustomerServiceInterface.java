@@ -2,21 +2,21 @@ package co.com.pragma.customer.servicecustomer.service;
 
 import java.util.List;
 
-import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
 
 public interface CustomerServiceInterface {
 
-	public List<Customer> listAllCustomers();
+	public List<CustomerDTO> listAllCustomers();
 
-	public Customer getCustomer(int identificationType, String identification);
+	public CustomerDTO getCustomer(int identificationType, String identification);
 
-	public Customer createCustomer(Customer customer) throws ServiceCustomerException;
+	public CustomerDTO createCustomer(CustomerDTO customer) throws ServiceCustomerException;
 
-	public Customer updateCustomer(Customer customer);
+	public CustomerDTO updateCustomer(CustomerDTO customer);
 
-	public Customer deleteCustomer(int identificationType, String identification);
+	public void deleteCustomer(int identificationType, String identification);
 
-	public List<Customer> findByAge(ComparatorEnum comparatorEnum, int age);
+	public List<CustomerDTO> findByAge(ComparatorEnum comparatorEnum, int age);
 }

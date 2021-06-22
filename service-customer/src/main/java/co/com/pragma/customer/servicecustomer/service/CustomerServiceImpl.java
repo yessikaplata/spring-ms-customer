@@ -2,18 +2,22 @@ package co.com.pragma.customer.servicecustomer.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import co.com.pragma.customer.servicecustomer.client.PhotoClientInterface;
+import co.com.pragma.customer.servicecustomer.entity.City;
 import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
 import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import lombok.RequiredArgsConstructor;
@@ -27,54 +31,60 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Autowired
 	private PhotoClientInterface photoClient;
 
+	private ModelMapper modelMapper = new ModelMapper();
+
 	@Override
-	public List<Customer> listAllCustomers() {
+	public List<CustomerDTO> listAllCustomers() {
 		List<Customer> customers = customerRepository.findAll();
 		return findPhotoCustomers(customers);
 	}
 
 	@Override
-	public Customer getCustomer(int identificationType, String identification) {
+	public CustomerDTO getCustomer(int identificationType, String identification) {
+		CustomerDTO customerDTO = null;
 		Customer customer = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
-		if (customer != null && customer.getPhotoId() != null) {
-			PhotoDTO photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
-			customer.setPhoto(photo);
+		if (customer != null) {
+			customerDTO = modelMapper.map(customer, CustomerDTO.class);
+			if (customer.getPhotoId() != null) {
+				PhotoDTO photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
+				customerDTO.setPhoto(photo);
+			}
 		}
-		return customer;
+		return customerDTO;
 	}
 
 	@Transactional
 	@Override
-	public Customer createCustomer(Customer customer) throws ServiceCustomerException {
+	public CustomerDTO createCustomer(CustomerDTO customer) throws ServiceCustomerException {
 		PhotoDTO photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
-		
+
 		if (customerDB != null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer exists in database");
 		}
 
-		// save customer
-		customer.setCreateAt(new Date());
-		customer.setUpdateAt(customer.getCreateAt());
+		// create object customer
+		customerDB = modelMapper.map(customer, Customer.class);
+		customerDB.setCreateAt(new Date());
+		customerDB.setUpdateAt(customerDB.getCreateAt());
 
-		// save photo and update customer
+		// insert photo into customer
 		if (customer.getPhoto() != null) {
 			photo = photoClient.createPhoto(customer.getPhoto()).getBody();
 			if (photo != null) {
-				customer.setPhotoId(photo.getId());
-				customer.setPhoto(photo);
+				customerDB.setPhotoId(photo.getId());
+				customerDB.setPhoto(photo);
 			}
 		}
-		customerDB = customerRepository.save(customer);
-		customerDB.setPhoto(photo);
-		return customerDB;
+		customerRepository.save(customerDB);
+		return modelMapper.map(customerDB, CustomerDTO.class);
 	}
 
 	@Transactional
 	@Override
-	public Customer updateCustomer(Customer customer) {
+	public CustomerDTO updateCustomer(CustomerDTO customer) {
 		PhotoDTO photo = null;
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
@@ -84,7 +94,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 		// update customer
 		customerDB.setAge(customer.getAge());
-		customerDB.setCityOfBirth(customer.getCityOfBirth());
+		customerDB.setCityOfBirth(modelMapper.map(customer.getCityOfBirth(), City.class));
 		customerDB.setLastName(customer.getLastName());
 		customerDB.setName(customer.getName());
 		customerDB.setUpdateAt(new Date());
@@ -97,7 +107,6 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 			} else {
 				photo.setContent(customer.getPhoto().getContent());
 				photo.setContentType(customer.getPhoto().getContentType());
-				photo.setUpdateAt(new Date());
 				photo.setName(customer.getPhoto().getName());
 				photo.setSize(customer.getPhoto().getSize());
 				photoClient.updatePhoto(photo.getId(), photo);
@@ -107,27 +116,26 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 		}
 		customerRepository.save(customerDB);
 		customerDB.setPhoto(photo);
-		return customerDB;
+		return modelMapper.map(customerDB, CustomerDTO.class);
 	}
 
 	@Transactional
 	@Override
-	public Customer deleteCustomer(int identificationType, String identification) {
+	public void deleteCustomer(int identificationType, String identification) {
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
 		if (customerDB == null) {
-			return null;
+			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer exists in database");
 		}
 		customerRepository.delete(customerDB);
 
 		if (customerDB.getPhotoId() != null) {
 			photoClient.deletePhoto(customerDB.getPhotoId());
 		}
-		return customerDB;
 	}
 
 	@Override
-	public List<Customer> findByAge(ComparatorEnum comparatorEnum, int age) {
+	public List<CustomerDTO> findByAge(ComparatorEnum comparatorEnum, int age) {
 		List<Customer> customers = null;
 		switch (comparatorEnum) {
 		case GREATER:
@@ -149,15 +157,17 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 		return findPhotoCustomers(customers);
 	}
 
-	private List<Customer> findPhotoCustomers(List<Customer> customers) {
+	private List<CustomerDTO> findPhotoCustomers(List<Customer> customers) {
+		List<CustomerDTO> customersDTO = null;
 		if (customers != null) {
-			PhotoDTO photo = null;
-			for (Customer customer : customers) {
-				photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
-				customer.setPhoto(photo);
-			}
+			customersDTO = customers.stream().map(c -> {
+				CustomerDTO customerDTO = modelMapper.map(c, CustomerDTO.class);
+				PhotoDTO photo = photoClient.getPhoto(c.getPhotoId()).getBody();
+				customerDTO.setPhoto(photo);
+				return customerDTO;
+			}).collect(Collectors.toList());
 		}
-		return customers;
+		return customersDTO;
 	}
 
 }

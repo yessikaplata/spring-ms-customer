@@ -13,10 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 import lombok.AllArgsConstructor;
@@ -34,28 +31,21 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonIgnore
 	private Long id;
 
-	@NotNull(message = "Identification Type must not be null.")
 	@ManyToOne
 	@JoinColumn(name = "identification_type_id")
 	private IdentificationType identificationType;
 
-	@NotEmpty(message = "Identification must not be empty.")
 	private String identification;
 
-	@NotEmpty(message = "Name must not be empty.")
 	private String name;
 
-	@NotEmpty(message = "Lastname must not be empty.")
 	@Column(name = "last_name")
 	private String lastName;
 
-	@NotNull(message = "Age must not be null.")
 	private Integer age;
 
-	@NotNull(message = "City of birth must not be null.")
 	@ManyToOne
 	@JoinColumn(name = "city_of_birth_id")
 	private City cityOfBirth;

@@ -9,15 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PhotoDTO {
-
-	private String id;
-
+public class IdentificationTypeDTO {
+	private int id;
+	private String abbreviation;
 	private String name;
-
-	private byte[] content;
-
-	private long size;
-
-	private String contentType;
 }

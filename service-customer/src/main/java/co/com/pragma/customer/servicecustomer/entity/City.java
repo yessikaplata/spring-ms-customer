@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "city")
 @Data
-@AllArgsConstructor @NoArgsConstructor @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class City {
 
 	@Id

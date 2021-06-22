@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import co.com.pragma.customer.servicecustomer.entity.City;
 import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
+import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import co.com.pragma.customer.servicecustomer.service.CustomerServiceImpl;
 import co.com.pragma.customer.servicecustomer.service.CustomerServiceInterface;
@@ -46,13 +47,13 @@ public class CustomerServiceMockTest {
 
 	@Test
 	public void whenValidateGetIdentificationAndIdentificationType_ThenReturnCustomer() {
-		Customer customerFound = service.getCustomer(2, "23434544");
+		CustomerDTO customerFound = service.getCustomer(2, "23434544");
 		Assertions.assertThat(customerFound.getName()).isEqualTo("Maria Alejandra");
 	}
 
 	@Test
 	public void whenValidateListAllCustomer_ThenReturnListCustomer() {
-		List<Customer> customers = service.listAllCustomers();
+		List<CustomerDTO> customers = service.listAllCustomers();
 		Assertions.assertThat(customers.size()).isEqualTo(1);
 	}
 }

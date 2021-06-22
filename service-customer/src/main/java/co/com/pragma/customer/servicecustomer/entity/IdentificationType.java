@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "identification_type")
 @Data
-@AllArgsConstructor @NoArgsConstructor @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class IdentificationType {
 
 	@Id

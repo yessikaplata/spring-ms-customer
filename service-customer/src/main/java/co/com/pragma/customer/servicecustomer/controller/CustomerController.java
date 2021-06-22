@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.com.pragma.customer.servicecustomer.entity.Customer;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
+import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
 import co.com.pragma.customer.servicecustomer.service.CustomerServiceInterface;
 import io.swagger.annotations.ApiOperation;
 
@@ -38,10 +38,10 @@ public class CustomerController {
 
 	@GetMapping
 	@ApiOperation(value = "Find all customer", notes = "Find all customer. To filter by age, provide the age and the comparator.")
-	public ResponseEntity<List<Customer>> listCustomers(
+	public ResponseEntity<List<CustomerDTO>> listCustomers(
 			@RequestParam(name = "comparator", required = false) ComparatorEnum comparator,
 			@RequestParam(name = "age", required = false) Integer age) {
-		List<Customer> customers = null;
+		List<CustomerDTO> customers = null;
 		if (comparator != null && age != null) {
 			customers = service.findByAge(comparator, age);
 		} else {
@@ -55,9 +55,9 @@ public class CustomerController {
 
 	@GetMapping(value = "/{type_id}/{identification}")
 	@ApiOperation(value = "Find a customer by type and ID number", notes = "Provide a type and ID number to look up specific customer.")
-	public ResponseEntity<Customer> getCustomer(@PathVariable("type_id") int typeId,
+	public ResponseEntity<CustomerDTO> getCustomer(@PathVariable("type_id") int typeId,
 			@PathVariable("identification") String identification) {
-		Customer customer = service.getCustomer(typeId, identification);
+		CustomerDTO customer = service.getCustomer(typeId, identification);
 		if (customer == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -66,16 +66,16 @@ public class CustomerController {
 
 	@PostMapping
 	@ApiOperation(value = "Create a customer", notes = "Provide customer data to create it.")
-	public ResponseEntity<Customer> createCustomer(@Valid @RequestBody(required = true) Customer customer)
+	public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody(required = true) CustomerDTO customer)
 			throws ServiceCustomerException {
-		Customer customerCreated = service.createCustomer(customer);
+		CustomerDTO customerCreated = service.createCustomer(customer);
 		return ResponseEntity.status(HttpStatus.CREATED).body(customerCreated);
 	}
 
 	@PutMapping
 	@ApiOperation(value = "Update a customer", notes = "Provide customer data to update it.")
-	public ResponseEntity<Customer> updateCustomer(@Valid @RequestBody(required = true) Customer customer) {
-		Customer customerUpdated = service.updateCustomer(customer);
+	public ResponseEntity<CustomerDTO> updateCustomer(@Valid @RequestBody(required = true) CustomerDTO customer) {
+		CustomerDTO customerUpdated = service.updateCustomer(customer);
 		if (customerUpdated == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -86,10 +86,7 @@ public class CustomerController {
 	@ApiOperation(value = "Delete a customer", notes = "Provide a type and ID number to delete specific customer.")
 	public ResponseEntity<Void> deleteCustomer(@PathVariable("type_id") int typeId,
 			@PathVariable("identification") String identification) {
-		Customer customerDeleted = service.deleteCustomer(typeId, identification);
-		if (customerDeleted == null) {
-			return ResponseEntity.notFound().build();
-		}
+		service.deleteCustomer(typeId, identification);
 		return ResponseEntity.ok().build();
 	}
 
