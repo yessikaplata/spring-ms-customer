@@ -22,7 +22,7 @@ import co.com.pragma.customer.servicecustomer.service.CustomerServiceImpl;
 import co.com.pragma.customer.servicecustomer.service.CustomerServiceInterface;
 
 @SpringBootTest
-public class CustomerServiceMockTest {
+public class CustomerServiceTest {
 
 	@Autowired
 	private CustomerServiceInterface service;
