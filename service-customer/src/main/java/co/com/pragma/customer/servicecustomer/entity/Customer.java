@@ -61,7 +61,5 @@ public class Customer {
 	@Column(name = "photo_id")
 	private String photoId;
 
-	@Transient
-	private PhotoDTO photo;
 
 }

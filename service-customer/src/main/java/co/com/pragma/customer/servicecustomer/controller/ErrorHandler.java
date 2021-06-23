@@ -35,7 +35,7 @@ public class ErrorHandler {
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<ErrorMessage> handleAllExceptions(HttpServletRequest request, Exception exception) {
 		ResponseEntity<ErrorMessage> resultado;
-
+		
 		String excepcionNombre = exception.getClass().getSimpleName();
 		String mensaje = formatMessage(exception);
 		Integer codigo = getStatusCode(exception);

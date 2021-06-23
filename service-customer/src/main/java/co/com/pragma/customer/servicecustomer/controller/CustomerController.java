@@ -3,6 +3,8 @@ package co.com.pragma.customer.servicecustomer.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,21 +41,22 @@ public class CustomerController {
 	private CustomerServiceInterface service;
 
 	@GetMapping
-	@ApiOperation(value = "Find all customer", notes = "Find all customer. To filter by age, provide the age and the comparator.")
+	@ApiOperation(value = "Find all customer", notes = "Find all customer.")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Customers found."),
+			@ApiResponse(code = 204, message = "Customers not found.") })
+	public ResponseEntity<List<CustomerDTO>> listCustomers() {
+		List<CustomerDTO> customers = service.listAllCustomers();
+		return ResponseEntity.ok(customers);
+	}
+
+	@GetMapping("/age/{comparator}/{age}/")
+	@ApiOperation(value = "Find customer by age", notes = "Find all customer by age. To filter by age, provide the age and the comparator.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Customers found."),
 			@ApiResponse(code = 204, message = "Customers not found.") })
 	public ResponseEntity<List<CustomerDTO>> listCustomers(
-			@RequestParam(name = "comparator", required = false) ComparatorEnum comparator,
-			@RequestParam(name = "age", required = false) Integer age) {
-		List<CustomerDTO> customers = null;
-		if (comparator != null && age != null) {
-			customers = service.findByAge(comparator, age);
-		} else {
-			customers = service.listAllCustomers();
-		}
-		if (customers == null || customers.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}
+			@PathVariable(name = "comparator", required = true) ComparatorEnum comparator,
+			@PathVariable(name = "age", required = true) int age) {
+		List<CustomerDTO> customers = service.listCustomersByAge(comparator, age);
 		return ResponseEntity.ok(customers);
 	}
 
@@ -64,9 +67,6 @@ public class CustomerController {
 	public ResponseEntity<CustomerDTO> getCustomer(@PathVariable("type_id") int typeId,
 			@PathVariable("identification") String identification) {
 		CustomerDTO customer = service.getCustomer(typeId, identification);
-		if (customer == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(customer);
 	}
 
@@ -86,9 +86,6 @@ public class CustomerController {
 			@ApiResponse(code = 404, message = "Customer not found.") })
 	public ResponseEntity<CustomerDTO> updateCustomer(@Valid @RequestBody(required = true) CustomerDTO customer) {
 		CustomerDTO customerUpdated = service.updateCustomer(customer);
-		if (customerUpdated == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(customerUpdated);
 	}
 

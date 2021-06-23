@@ -7,6 +7,7 @@ import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException
 import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
 
 public interface CustomerServiceInterface {
+	
 
 	public List<CustomerDTO> listAllCustomers();
 
@@ -18,5 +19,6 @@ public interface CustomerServiceInterface {
 
 	public void deleteCustomer(int identificationType, String identification);
 
-	public List<CustomerDTO> findByAge(ComparatorEnum comparatorEnum, int age);
+	public List<CustomerDTO> listCustomersByAge(ComparatorEnum comparatorEnum, int age);
+	
 }
