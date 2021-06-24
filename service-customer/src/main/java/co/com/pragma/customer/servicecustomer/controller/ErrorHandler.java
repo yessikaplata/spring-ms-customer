@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,12 +31,14 @@ public class ErrorHandler {
 
 	public ErrorHandler() {
 		STATUS_CODES.put(MethodArgumentNotValidException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
+		STATUS_CODES.put(MethodArgumentTypeMismatchException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
+
 	}
 
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<ErrorMessage> handleAllExceptions(HttpServletRequest request, Exception exception) {
 		ResponseEntity<ErrorMessage> resultado;
-		
+
 		String excepcionNombre = exception.getClass().getSimpleName();
 		String mensaje = formatMessage(exception);
 		Integer codigo = getStatusCode(exception);
@@ -65,6 +68,14 @@ public class ErrorHandler {
 		if (e instanceof BindingResult) {
 			BindingResult bindingResult = (BindingResult) e;
 			return formatMessage(bindingResult);
+		}
+		if (e instanceof MethodArgumentTypeMismatchException) {
+			MethodArgumentTypeMismatchException ex = (MethodArgumentTypeMismatchException) e;
+			String name = ex.getName();
+			String type = ex.getRequiredType().getSimpleName();
+			Object value = ex.getValue();
+			String message = String.format("%s should be a valid %s and value '%s' is not.", name, type, value);
+			return message;
 		}
 		return e.getMessage();
 	};

@@ -1,7 +1,11 @@
 package co.com.pragma.customer.servicecustomer.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -154,16 +158,35 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	}
 
 	private List<CustomerDTO> findPhotoCustomers(List<Customer> customers) {
+		CustomerDTO customerDTO = null;
+		PhotoDTO photoDTO = null;
 		List<CustomerDTO> customersDTO = null;
-		if (customers != null) {
-			customersDTO = customers.stream().map(c -> {
-				CustomerDTO customerDTO = modelMapper.map(c, CustomerDTO.class);
+		List<String> ids = new ArrayList<String>();
+
+		if (customers != null && !customers.isEmpty()) {
+
+			Map<String, CustomerDTO> mapa = new HashMap<String, CustomerDTO>();
+			customersDTO = new ArrayList<CustomerDTO>();
+			for (Customer c : customers) {
+				customerDTO = modelMapper.map(c, CustomerDTO.class);
 				if (c.getPhotoId() != null && !c.getPhotoId().isBlank()) {
-					PhotoDTO photo = photoClient.getPhoto(c.getPhotoId()).getBody();
-					customerDTO.setPhoto(photo);
+					ids.add(c.getPhotoId());
+					mapa.put(c.getPhotoId(), customerDTO);
+				} else {
+					customersDTO.add(customerDTO);
 				}
-				return customerDTO;
-			}).collect(Collectors.toList());
+			}
+
+			List<PhotoDTO> photos = photoClient.listPhotosByIds(ids).getBody();
+			Map<String, PhotoDTO> mapPhotos = photos.stream()
+					.collect(Collectors.toMap(PhotoDTO::getId, Function.identity()));
+
+			for (Map.Entry<String, CustomerDTO> c : mapa.entrySet()) {
+				customerDTO = c.getValue();
+				photoDTO = mapPhotos.get(customerDTO.getPhotoId());
+				customerDTO.setPhoto(photoDTO);
+				customersDTO.add(customerDTO);
+			}
 		}
 		return customersDTO;
 	}

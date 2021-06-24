@@ -32,9 +32,13 @@ public class PhotoController {
 	@ApiOperation(value = "Find all photos.", notes = "Find all photos in databases.")
 	public ResponseEntity<List<PhotoDTO>> listAllPhotos() {
 		List<PhotoDTO> photos = photoService.listAllPhotos();
-		if (photos == null || photos.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}
+		return ResponseEntity.ok(photos);
+	}
+	
+	@GetMapping("/ids")
+	@ApiOperation(value = "Find all photos.", notes = "Find all photos in databases.")
+	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestParam("ids") List<String> ids) {
+		List<PhotoDTO> photos = photoService.listPhotosByIds(ids);
 		return ResponseEntity.ok(photos);
 	}
 

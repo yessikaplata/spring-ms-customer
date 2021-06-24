@@ -3,8 +3,6 @@ package co.com.pragma.customer.servicecustomer.controller;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
@@ -54,8 +51,8 @@ public class CustomerController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Customers found."),
 			@ApiResponse(code = 204, message = "Customers not found.") })
 	public ResponseEntity<List<CustomerDTO>> listCustomers(
-			@PathVariable(name = "comparator", required = true) ComparatorEnum comparator,
-			@PathVariable(name = "age", required = true) int age) {
+			@PathVariable("comparator") ComparatorEnum comparator,
+			@PathVariable("age") int age) {
 		List<CustomerDTO> customers = service.listCustomersByAge(comparator, age);
 		return ResponseEntity.ok(customers);
 	}

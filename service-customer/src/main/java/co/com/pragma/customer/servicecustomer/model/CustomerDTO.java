@@ -3,6 +3,8 @@ package co.com.pragma.customer.servicecustomer.model;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,4 +35,7 @@ public class CustomerDTO {
 	private CityDTO cityOfBirth;
 
 	private PhotoDTO photo;
+	
+	@JsonIgnore
+	private String photoId;
 }

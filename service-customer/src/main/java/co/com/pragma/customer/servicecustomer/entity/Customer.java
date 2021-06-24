@@ -12,10 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
-
-import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

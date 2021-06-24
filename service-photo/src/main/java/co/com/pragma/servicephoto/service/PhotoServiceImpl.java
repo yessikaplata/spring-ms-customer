@@ -117,4 +117,16 @@ public class PhotoServiceImpl implements PhotoServiceInterface {
 		photoRepository.delete(photo);
 	}
 
+	@Override
+	public List<PhotoDTO> listPhotosByIds(List<String> ids) {
+		List<PhotoDTO> photosDTO = null;
+		List<Photo> photos = photoRepository.findByIdIn(ids);
+		if (photos != null) {
+			photosDTO = photos.stream().map(photo -> {
+				return modelMapper.map(photo, PhotoDTO.class);
+			}).collect(Collectors.toList());
+		}
+		return photosDTO;
+	}
+
 }

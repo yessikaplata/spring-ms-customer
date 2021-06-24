@@ -10,6 +10,8 @@ import co.com.pragma.servicephoto.model.PhotoDTO;
 public interface PhotoServiceInterface {
 
 	public List<PhotoDTO> listAllPhotos();
+	
+	public List<PhotoDTO> listPhotosByIds(List<String> ids);
 
 	public PhotoDTO createPhoto(MultipartFile file) throws IOException;
 
