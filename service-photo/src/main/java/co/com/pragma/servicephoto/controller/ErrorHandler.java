@@ -47,6 +47,7 @@ public class ErrorHandler {
 				.uriRequest(request.getRequestURI()).statusCode(codigo).build();
 		resultado = new ResponseEntity<>(error, HttpStatus.valueOf(codigo));
 		log.error(exception.getMessage());
+		exception.printStackTrace();
 		return resultado;
 	}
 	

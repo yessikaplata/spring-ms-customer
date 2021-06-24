@@ -35,9 +35,9 @@ public class PhotoController {
 		return ResponseEntity.ok(photos);
 	}
 	
-	@GetMapping("/ids")
+	@PostMapping("/ids")
 	@ApiOperation(value = "Find all photos.", notes = "Find all photos in databases.")
-	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestParam("ids") List<String> ids) {
+	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestBody(required = true) List<String> ids) {
 		List<PhotoDTO> photos = photoService.listPhotosByIds(ids);
 		return ResponseEntity.ok(photos);
 	}

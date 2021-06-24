@@ -183,7 +183,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 			for (Map.Entry<String, CustomerDTO> c : mapa.entrySet()) {
 				customerDTO = c.getValue();
-				photoDTO = mapPhotos.get(customerDTO.getPhotoId());
+				photoDTO = mapPhotos.get(customerDTO.getPhoto().getId());
 				customerDTO.setPhoto(photoDTO);
 				customersDTO.add(customerDTO);
 			}

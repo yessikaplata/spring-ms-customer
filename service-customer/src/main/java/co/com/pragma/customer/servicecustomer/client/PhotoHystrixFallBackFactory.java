@@ -36,5 +36,4 @@ public class PhotoHystrixFallBackFactory implements PhotoClientInterface {
 		return ResponseEntity.ok(new ArrayList<PhotoDTO>());
 	}
 
-
 }

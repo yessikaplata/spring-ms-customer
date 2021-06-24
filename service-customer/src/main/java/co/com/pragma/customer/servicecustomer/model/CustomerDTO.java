@@ -36,6 +36,4 @@ public class CustomerDTO {
 
 	private PhotoDTO photo;
 	
-	@JsonIgnore
-	private String photoId;
 }

@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
-import io.swagger.annotations.ApiOperation;
 
 @FeignClient(name = "service-photo", path = "/photos", fallback = PhotoHystrixFallBackFactory.class)
 public interface PhotoClientInterface {
@@ -31,6 +29,6 @@ public interface PhotoClientInterface {
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<PhotoDTO> deletePhoto(@PathVariable("id") String id);
 	
-	@GetMapping("/ids")
-	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestParam("ids") List<String> ids);
+	@PostMapping("/ids")
+	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestBody(required = true) List<String> ids);
 }
