@@ -7,6 +7,8 @@ eureka:
       defaultZone: http://${HOSTNAME}:8091/eureka/
   instance:
     preferIpAddress: true
+  instance:
+    ipAddress: ${HOSTNAME}
 spring:
   cloud:
     gateway:
