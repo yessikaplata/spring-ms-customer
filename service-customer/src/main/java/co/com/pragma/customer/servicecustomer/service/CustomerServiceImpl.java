@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import static co.com.pragma.utilities.Util.*;
 
 import javax.transaction.Transactional;
 
@@ -108,12 +109,12 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 		customerDB.setLastName(customer.getLastName());
 		customerDB.setName(customer.getName());
 		customerDB.setUpdateAt(new Date());
-		customerRepository.save(customerDB);
+		customerDB = customerRepository.save(customerDB);
 
 		// create or update photo
 		PhotoDTO photo = null;
 		if (customer.getPhoto() != null) {
-			photo = photoClient.getPhoto(customerDB.getPhotoId()).getBody();
+			photo = photoClient.getPhoto(customer.getPhoto().getId()).getBody();
 			if (photo == null) {
 				photo = photoClient.createPhoto(customer.getPhoto()).getBody();
 			} else {
@@ -121,7 +122,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 				photo.setContentType(customer.getPhoto().getContentType());
 				photo.setName(customer.getPhoto().getName());
 				photo.setSize(customer.getPhoto().getSize());
-				photoClient.updatePhoto(photo.getId(), photo);
+				photo = photoClient.updatePhoto(photo.getId(), photo).getBody();
 			}
 			customerDB.setPhotoId(photo.getId());
 		}
@@ -178,9 +179,10 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 	private List<CustomerDTO> buildListCustomersDTOWithPhoto(List<Customer> customers) {
 
+		
 		List<CustomerDTO> customersDTO = null;
 
-		if (customers != null && !customers.isEmpty()) {
+		if (isNotEmpty(customers)) {
 			CustomerDTO customerDTO = null;
 			Map<String, CustomerDTO> mapa = new HashMap<String, CustomerDTO>();
 			customersDTO = new ArrayList<CustomerDTO>();

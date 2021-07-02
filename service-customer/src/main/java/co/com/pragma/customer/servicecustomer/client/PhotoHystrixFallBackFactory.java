@@ -27,7 +27,7 @@ public class PhotoHystrixFallBackFactory implements PhotoClientInterface {
 	}
 
 	@Override
-	public ResponseEntity<PhotoDTO> deletePhoto(String id) {
+	public ResponseEntity<Void> deletePhoto(String id) {
 		return ResponseEntity.ok().build();
 	}
 

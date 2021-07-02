@@ -27,7 +27,7 @@ public interface PhotoClientInterface {
 
 
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<PhotoDTO> deletePhoto(@PathVariable("id") String id);
+	public ResponseEntity<Void> deletePhoto(@PathVariable("id") String id);
 	
 	@PostMapping("/ids")
 	public ResponseEntity<List<PhotoDTO>> listPhotosByIds(@RequestBody(required = true) List<String> ids);
