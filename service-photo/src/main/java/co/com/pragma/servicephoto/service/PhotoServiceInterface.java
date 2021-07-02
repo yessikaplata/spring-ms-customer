@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import co.com.pragma.servicephoto.model.PhotoDTO;
+import co.com.pragma.dto.PhotoDTO;
 
 public interface PhotoServiceInterface {
 

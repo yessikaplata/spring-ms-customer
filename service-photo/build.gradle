@@ -21,6 +21,7 @@ repositories {
 ext {
 	set('springCloudVersion', "2020.0.3")
 	set('springBootAdminVersion', "2.3.1")
+    set('externalProject', "D:/Git/libs")
 }
 
 dependencies {
@@ -37,6 +38,8 @@ dependencies {
 	implementation 'io.springfox:springfox-swagger2:2.9.2'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.9'
+	
+	implementation fileTree(dir: "${externalProject}", include: '*.jar')
 	
 }
 dependencyManagement {

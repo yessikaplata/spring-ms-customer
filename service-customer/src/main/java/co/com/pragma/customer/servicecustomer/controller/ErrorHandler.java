@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,6 +33,8 @@ public class ErrorHandler {
 	public ErrorHandler() {
 		STATUS_CODES.put(MethodArgumentNotValidException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
 		STATUS_CODES.put(MethodArgumentTypeMismatchException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
+		STATUS_CODES.put(HttpMessageNotReadableException.class.getSimpleName(), HttpStatus.BAD_REQUEST.value());
+		
 
 	}
 
@@ -51,7 +54,6 @@ public class ErrorHandler {
 				.path(request.getRequestURI()).status(codigo).error(HttpStatus.valueOf(codigo).name()).build();
 		resultado = new ResponseEntity<>(error, HttpStatus.valueOf(codigo));
 		log.error(exception.getMessage());
-		exception.printStackTrace();
 		return resultado;
 	}
 

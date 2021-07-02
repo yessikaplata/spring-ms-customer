@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
+import co.com.pragma.dto.PhotoDTO;
 
 @FeignClient(name = "service-photo", path = "/photos", fallback = PhotoHystrixFallBackFactory.class)
 public interface PhotoClientInterface {

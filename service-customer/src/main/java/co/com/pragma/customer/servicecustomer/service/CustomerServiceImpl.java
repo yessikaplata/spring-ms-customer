@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ import co.com.pragma.customer.servicecustomer.entity.IdentificationType;
 import co.com.pragma.customer.servicecustomer.enums.ComparatorEnum;
 import co.com.pragma.customer.servicecustomer.exception.ServiceCustomerException;
 import co.com.pragma.customer.servicecustomer.model.CustomerDTO;
-import co.com.pragma.customer.servicecustomer.model.PhotoDTO;
+import co.com.pragma.dto.PhotoDTO;
 import co.com.pragma.customer.servicecustomer.repository.CustomerRepositoryInterface;
 import lombok.RequiredArgsConstructor;
 
@@ -32,20 +31,26 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
 	private final CustomerRepositoryInterface customerRepository;
 
-	@Autowired
-	private PhotoClientInterface photoClient;
+	private final PhotoClientInterface photoClient;
 
 	private ModelMapper modelMapper = new ModelMapper();
 
 	@Override
+	public List<CustomerDTO> listAllCustomers() {
+		List<Customer> customers = customerRepository.findAll();
+		return buildListCustomersDTOWithPhoto(customers);
+	}
+
+	@Override
 	public CustomerDTO getCustomer(int identificationType, String identification) {
-		CustomerDTO customerDTO = null;
+
 		Customer customer = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
+
 		if (customer == null) {
 			throw new ServiceCustomerException(HttpStatus.NOT_FOUND, "Customer not exists in database");
 		}
-		customerDTO = modelMapper.map(customer, CustomerDTO.class);
+		CustomerDTO customerDTO = modelMapper.map(customer, CustomerDTO.class);
 		if (customer.getPhotoId() != null) {
 			PhotoDTO photo = photoClient.getPhoto(customer.getPhotoId()).getBody();
 			customerDTO.setPhoto(photo);
@@ -56,23 +61,31 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public CustomerDTO createCustomer(CustomerDTO customer) throws ServiceCustomerException {
-		PhotoDTO photo = null;
+
+		// validate customer not exist in database
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 
 		if (customerDB != null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer exists in database");
 		}
+
+		// save customer
 		customerDB = modelMapper.map(customer, Customer.class);
 		customerDB.setCreateAt(new Date());
 		customerDB.setUpdateAt(customerDB.getCreateAt());
+		customerDB = customerRepository.save(customerDB);
+
+		// save photo
+		PhotoDTO photo = null;
 		if (customer.getPhoto() != null) {
 			photo = photoClient.createPhoto(customer.getPhoto()).getBody();
 			if (photo != null) {
 				customerDB.setPhotoId(photo.getId());
 			}
 		}
-		customerRepository.save(customerDB);
+
+		// convert entity to dto
 		customer = modelMapper.map(customerDB, CustomerDTO.class);
 		customer.setPhoto(photo);
 		return customer;
@@ -81,19 +94,24 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public CustomerDTO updateCustomer(CustomerDTO customer) {
-		PhotoDTO photo = null;
+
+		// validate customer exist in database
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(customer.getIdentification(),
 				IdentificationType.builder().id(customer.getIdentificationType().getId()).build());
 		if (customerDB == null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer not exists in database");
 		}
 
+		// update data for customer entity
 		customerDB.setAge(customer.getAge());
 		customerDB.setCityOfBirth(modelMapper.map(customer.getCityOfBirth(), City.class));
 		customerDB.setLastName(customer.getLastName());
 		customerDB.setName(customer.getName());
 		customerDB.setUpdateAt(new Date());
+		customerRepository.save(customerDB);
 
+		// create or update photo
+		PhotoDTO photo = null;
 		if (customer.getPhoto() != null) {
 			photo = photoClient.getPhoto(customerDB.getPhotoId()).getBody();
 			if (photo == null) {
@@ -107,7 +125,8 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 			}
 			customerDB.setPhotoId(photo.getId());
 		}
-		customerRepository.save(customerDB);
+
+		// convert entity to dto
 		customer = modelMapper.map(customerDB, CustomerDTO.class);
 		customer.setPhoto(photo);
 		return customer;
@@ -116,26 +135,26 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 	@Transactional
 	@Override
 	public void deleteCustomer(int identificationType, String identification) {
+
+		// validate customer exist in database
 		Customer customerDB = customerRepository.findByIdentificationAndIdentificationType(identification,
 				IdentificationType.builder().id(identificationType).build());
 		if (customerDB == null) {
 			throw new ServiceCustomerException(HttpStatus.BAD_REQUEST, "Customer not exists in database");
 		}
+
+		// delete customer
 		customerRepository.delete(customerDB);
 
+		// delte photo
 		if (customerDB.getPhotoId() != null) {
 			photoClient.deletePhoto(customerDB.getPhotoId());
 		}
 	}
 
 	@Override
-	public List<CustomerDTO> listAllCustomers() {
-		List<Customer> customers = customerRepository.findAll();
-		return findPhotoCustomers(customers);
-	}
-
-	@Override
 	public List<CustomerDTO> listCustomersByAge(ComparatorEnum comparatorEnum, int age) {
+
 		List<Customer> customers = null;
 		switch (comparatorEnum) {
 		case GREATER:
@@ -154,38 +173,40 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 			customers = customerRepository.findByAge(age);
 			break;
 		}
-		return findPhotoCustomers(customers);
+		return buildListCustomersDTOWithPhoto(customers);
 	}
 
-	private List<CustomerDTO> findPhotoCustomers(List<Customer> customers) {
-		CustomerDTO customerDTO = null;
-		PhotoDTO photoDTO = null;
+	private List<CustomerDTO> buildListCustomersDTOWithPhoto(List<Customer> customers) {
+
 		List<CustomerDTO> customersDTO = null;
-		List<String> ids = new ArrayList<String>();
 
 		if (customers != null && !customers.isEmpty()) {
-
+			CustomerDTO customerDTO = null;
 			Map<String, CustomerDTO> mapa = new HashMap<String, CustomerDTO>();
 			customersDTO = new ArrayList<CustomerDTO>();
+			
+			//add customers without photo and build map customers with photos
 			for (Customer c : customers) {
 				customerDTO = modelMapper.map(c, CustomerDTO.class);
 				if (c.getPhotoId() != null && !c.getPhotoId().isBlank()) {
-					ids.add(c.getPhotoId());
 					mapa.put(c.getPhotoId(), customerDTO);
 				} else {
 					customersDTO.add(customerDTO);
 				}
 			}
-
-			List<PhotoDTO> photos = photoClient.listPhotosByIds(ids).getBody();
-			Map<String, PhotoDTO> mapPhotos = photos.stream()
-					.collect(Collectors.toMap(PhotoDTO::getId, Function.identity()));
-
-			for (Map.Entry<String, CustomerDTO> c : mapa.entrySet()) {
-				customerDTO = c.getValue();
-				photoDTO = mapPhotos.get(customerDTO.getPhoto().getId());
-				customerDTO.setPhoto(photoDTO);
-				customersDTO.add(customerDTO);
+			
+			//add customers with photo
+			if (!mapa.isEmpty()) {
+				List<PhotoDTO> photos = photoClient.listPhotosByIds(new ArrayList<String>(mapa.keySet())).getBody();
+				Map<String, PhotoDTO> mapPhotos = photos.stream()
+						.collect(Collectors.toMap(PhotoDTO::getId, Function.identity()));
+				PhotoDTO photoDTO = null;
+				for (Map.Entry<String, CustomerDTO> c : mapa.entrySet()) {
+					customerDTO = c.getValue();
+					photoDTO = mapPhotos.get(customerDTO.getPhoto().getId());
+					customerDTO.setPhoto(photoDTO);
+					customersDTO.add(customerDTO);
+				}
 			}
 		}
 		return customersDTO;

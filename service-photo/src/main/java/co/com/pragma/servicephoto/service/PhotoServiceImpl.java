@@ -14,8 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import co.com.pragma.servicephoto.entity.Photo;
 import co.com.pragma.servicephoto.exception.ServicePhotoException;
-import co.com.pragma.servicephoto.model.PhotoDTO;
+import co.com.pragma.dto.PhotoDTO;
 import co.com.pragma.servicephoto.repository.PhotoRepositoryInterface;
+
 
 @Service
 public class PhotoServiceImpl implements PhotoServiceInterface {
